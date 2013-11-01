@@ -90,10 +90,12 @@ for n=2:nt
          w = wsf(k);
          C0 = squeeze( Cm(:,k,n-1) );
          [t2,C2]=ode45('settle_cv',tint,C0); % stiff equation solver
+         %[t2,C2]=ode23('settle_cv',tint,C0); % stiff equation solver
          Cm(:,k,n)=C2(end,:);
          
          if any(any (Cm(:,:,n)<0.0))
             % adapting the time step when large ws?
+            fprintf(1,'Neg mass calcs\n')
             dtfull=t(n)-t(n-1);
             dtsum=0;
             Ctmp=Cm(:,k,n);

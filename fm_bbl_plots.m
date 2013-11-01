@@ -1,5 +1,5 @@
 %% fm_bbl_plots
-
+cmap = jet(npmud);
 figure(2); clf;
 subplot(121)
 hold on
@@ -194,9 +194,3 @@ set(gca,'XScale','log','FontSize',12)
 xlabel('Particle size (um)','FontSize',fs); ylabel('Concentration (g/l)','FontSize',fs);
 if i==1; ylabel({'0.05mab';'Concentration (g/l)'},'FontSize',fs);end
 end
-
-toc
-
-
-
-% profile viewer

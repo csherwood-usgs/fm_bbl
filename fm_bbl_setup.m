@@ -87,7 +87,7 @@ omegac = 2*pi/(Tc);
 Ttot = 1.75*Tc; % (s) overall time interval for solution
 %Ttot = .2*Tc; % short run
 CFLt = dzz/abs(wss)
-dt = 10; % (s) for calculations
+dt = 1; % (s) for calculations
 dtint = fix(CFLt/2) % (s) dt for settling solution
 
 t = 0:dt:Ttot;
