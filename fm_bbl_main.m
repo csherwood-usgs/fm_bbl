@@ -83,45 +83,24 @@ for n=2:nt
    end
    
    if(do_floc)
-      tint = (0:t(n)-t(n-1));
-      
-      % Settle all particles
-      for k=1:npmud
-         w = wsf(k);
-         C0 = squeeze( Cm(:,k,n-1) );
-         [t2,C2]=ode45('settle_cv',tint,C0); % stiff equation solver
-         %[t2,C2]=ode23('settle_cv',tint,C0); % stiff equation solver
-         Cm(:,k,n)=C2(end,:);
-         
-         if any(any (Cm(:,:,n)<0.0))
-            % adapting the time step when large ws?
-            fprintf(1,'Neg mass calcs\n')
-            dtfull=t(n)-t(n-1);
-            dtsum=0;
-            Ctmp=Cm(:,k,n);
-            Ctmpint=Cm(:,k,n-1);
-            dttemp=dtfull;
-            while dtsum<dtfull
-               while (any (Ctmp<0.0))
-                  dttemp=dttemp/2;
-                  tinttmp=(0:dtint:dttemp);
-                  C0 = squeeze( Ctmpint );
-                  [t2,C2]=ode45('settle_cv',tinttmp,C0); % stiff equation solver
-                  Ctmp=C2(end,:);
-               end
-               dtsum=dtsum+dttemp;
-               dttemp=min(dttemp,dtfull-dtsum);
-               Ctmpint=Ctmp;
-            end
-            Cm(:,k,n)=Ctmp;           
+      if(do_settle)
+         tint = (0:t(n)-t(n-1));
+         % Settle all particles
+         for k=1:npmud
+            w = wsf(k);
+            C0 = squeeze( Cm(:,k,n-1) );
+            [t2,C2]=ode45('settle_cv',tint,C0); % stiff equation solver
+            %[t2,C2]=ode23('settle_cv',tint,C0); % stiff equation solver
+            Cm(:,k,n)=C2(end,:);
          end
+      end
+      % Floc all depths 
+      for iz = 1:nzc
+         cv_tmp = Cm(iz,:,n)';
+         fm_bbl_calcfloc
+         Cm(iz,:,n) = cv_wat;
       end
    else
       Cm(:,:,n)=Cm(:,:,n-1);
-   end
-   for iz = 1:nzc
-      cv_tmp = Cm(iz,:,n)';
-      fm_bbl_calcfloc
-      Cm(iz,:,n) = cv_wat;
    end
 end
