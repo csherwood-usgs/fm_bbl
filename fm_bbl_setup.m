@@ -1,6 +1,6 @@
 % fm_bbl_setup
 clear
-global dz w K Erate
+global dz dzf dzc w K Erate Drate
 
 % Constants
 vk = 0.41;    % ( ) von Karman's const.
@@ -76,7 +76,9 @@ wsf =  -g*(rhof-rhow).*Df.^2 ./(18.*0.001);
 % Initialize bbl
 zf = (0:dzz:h)';         % faces
 dz = diff(zf);
+dzf = dz;
 zc = (dzz/2:dzz:h-dzz/2)'; % centers
+dzc = diff(zc);
 nzc = length(zc);
 
 % Initial mud concentration

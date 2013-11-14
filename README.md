@@ -13,3 +13,6 @@ a FORTRAN version of FlocMod by Verney.
 Verney et al. (2011) Behaviour of a floc population during a tidal cycle:
 Laboratory experiments and numerical modeling.
 Continental Shelf Research 31:564-583.
+
+Additions to make this work for a bottom boundary layer include downward settling, upward vertical diffusion, and resuspension of sand.
+

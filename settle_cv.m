@@ -1,8 +1,9 @@
-function dcdt = settle_cv(t,c)
+edfunction dcdt = settle_cv(t,c)
 % kernal for settling/diffusion model
 % This uses control volume formulation
 % ws is a uniform scalar, K is on interfaces
 % dz should be distances between cell centers
+%    and must be uniform
 global dz w K
 nz = length(c);
 dcdt = zeros(nz,1);
@@ -15,4 +16,5 @@ dcdt(nz) =     K(nz-1)*(c(nz-1)-c(nz))/dz(nz-1);
 % upwind flux 
 dcdt(2:nz) =   dcdt(2:nz)   +(w>0)*abs(w)*c(1:nz-1) - (w<0)*abs(w)*c(2:nz);
 dcdt(1:nz-1) = dcdt(1:nz-1) -(w>0)*abs(w)*c(1:nz-1) + (w<0)*abs(w)*c(2:nz);
+dcdt = dcdt./dz;
 

@@ -38,8 +38,7 @@ for n=2:nt
       ustcw(n) = [m.ustrr];
       zoa(n) = [m.zoa];
    end
-   erate(n) = max(0., E0*Cb*(taub(n)-tauc)/tauc );
-   Erate = erate(n); % passed as global
+   erate(n) = max(0., E0*Cb*(taub(n)-tauc)/tauc ); 
    
    % Calc bbl mixing and turbulence
    K = vk*ustc(n)*zf(2:end-1);              % K is on faces
@@ -73,9 +72,13 @@ for n=2:nt
       tint = (0:t(n)-t(n-1));
       % Settle sand
       for k=1:nps
+         % right now, wss and erate are for only one sand class
          w = wss;
+         Erate = erate(n); % passed as global
+         Drate = 1;
          C0 = squeeze( Cvs(:,k,n-1) );
-         [t2,C2]=ode45('resus_settle_cv',tint,C0); % stiff equation solver
+         [t2,C2]=ode45('resus_settle_leer',tint,C0); % general ode equation solver
+         %[t2,C2]=ode45('resus_settle_cv',tint,C0); % general ode equation solver
          %[t2,C2]=ode23('resus_settle_cv',tint,C0); % stiff equation solver
          Cvs(:,k,n)=C2(end,:);
       end
@@ -89,9 +92,9 @@ for n=2:nt
          % Settle all particles
          for k=1:npmud
             w = wsf(k);
+            Drate = 0; Erate = 0; % no flux bottom bc
             C0 = squeeze( Cm(:,k,n-1) );
-            [t2,C2]=ode45('settle_cv',tint,C0); % stiff equation solver
-            %[t2,C2]=ode23('settle_cv',tint,C0); % stiff equation solver
+            [t2,C2]=ode45('resus_settle_leer',tint,C0); % general ode equation solver
             Cm(:,k,n)=C2(end,:);
          end
       end
