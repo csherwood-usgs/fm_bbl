@@ -17,28 +17,29 @@ Cm = zeros( nzc, npmud, nt );
 Gsave=zeros(nzc, nt);
 Cm(:,:,1) = massconc;
 totmass_m = sum( sum( Cm(:,:,1) )*dzz)
-
 Cvs = zeros( nzc, nps, nt );
-ustc = zeros(nt,1);
-ustw = zeros(nt,1);
-ustcw = zeros(nt,1);
-zoa = zeros(nt,1);
-taub = zeros(nt,1);
-taub = zeros(nt,1);
+erate = zeros(nt,1);
+if (do_wcbbl_model)
+   ustc = zeros(nt,1);
+   ustw = zeros(nt,1);
+   ustcw = zeros(nt,1);
+   zoa = zeros(nt,1);
+   taub = zeros(nt,1);
+end
 
 for n=2:nt
    totmass_m = sum( sum( Cm(:,:,n-1) )*dzz);
    totmass_s = sum( sum( rhoss*Cvs(:,:,n-1) )*dzz);
    fprintf(1,'t = %f, tot. mass sand= %f and tot. mass mud =%f\n',t(n),totmass_s,totmass_m)
-   m=m94(uw(n),omegaw,uc(n),1,0.,kN,0);
-   ustc(n) = [m.ustrc];
-   ustw(n) = [m.ustrwm];
-   ustcw(n) = [m.ustrr];
-   zoa(n) = [m.zoa];
-   taub(n) = rhow*ustcw(n).^2;
-   
-   Erate = max(0., E0*Cb*(taub(n)-tauc)/tauc );
-   erate(n)=Erate;
+   if(do_wcbbl_model)
+      m=m94(uw(n),omegaw,uc(n),1,0.,kN,0);
+      ustc(n) = [m.ustrc];
+      ustw(n) = [m.ustrwm];
+      ustcw(n) = [m.ustrr];
+      zoa(n) = [m.zoa];
+   end
+   erate(n) = max(0., E0*Cb*(taub(n)-tauc)/tauc );
+   Erate = erate(n); % passed as global
    
    % Calc bbl mixing and turbulence
    K = vk*ustc(n)*zf(2:end-1);              % K is on faces
@@ -94,7 +95,7 @@ for n=2:nt
             Cm(:,k,n)=C2(end,:);
          end
       end
-      % Floc all depths 
+      % Floc all depths
       for iz = 1:nzc
          cv_tmp = Cm(iz,:,n)';
          fm_bbl_calcfloc

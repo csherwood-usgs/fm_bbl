@@ -23,6 +23,7 @@ do_sand = 1
 do_wibergK=1
 do_altG=1
 do_floc=1
+do_wcbbl_model=0 % instead, provide time series u*, u*c, u*cw
 
 % Sand characteristics
 nps = 1;        % number of sand classes
@@ -81,14 +82,14 @@ nzc = length(zc);
 % Initial mud concentration
 massconc = 0.10*ones(nzc,npmud)./npmud; % g/l = kg/m3
 
-%% Time series of forcing
+% Time series of forcing
 Tc = 4*3600; % tidal current period
 omegac = 2*pi/(Tc);
 Ttot = 1.75*Tc; % (s) overall time interval for solution
 %Ttot = .2*Tc; % short run
-CFLt = dzz/abs(wss)
-dt = 1; % (s) for calculations
+CFLt = dzz/(max( abs(wss), max(abs(wsf)) ))
 dtint = fix(CFLt/2) % (s) dt for settling solution
+dt = dtint/2; % (s) for calculations
 
 t = 0:dt:Ttot;
 nt = length(t);
@@ -105,7 +106,7 @@ if(0)
 end
 
 % time-dependent forcing
-if(1)
+if(0)
    Te = 2*3600; % wave event period
    uc = 0.2+0.2* sin( omegac*t );
    te = 0:dt:Te;
@@ -117,6 +118,32 @@ if(1)
    uw = zeros(size(t));
    uw(ies:ies+length(uwe)-1)=uwe;
    figure(3); clf; plot(t/3600,uw,'-b',t/3600,uc,'-r')
+end
+% MVCO modeled stresses
+if(1)
+   do_wcbbl_model = 0;
+   ds = datenum('24-Sep-2011')
+   ds = datenum('2-Oct-2011')
+   de = datenum('5-Oct-2011')
+   t = 0:dt:((de-ds)*24*3600);
+   nt = length(t);
+   tint = ds:dt/(3600*24):de;
+   load MVCO_stress
+   ustc = interp1(dn,ustc,tint);
+   ustw = interp1(dn,ustw,tint);
+   ustcw = interp1(dn,ustcw,tint);
+   taub = rhow*ustcw.^2;
+   zoa = ones(nt,1)*zoc;
+   figure(1); clf
+   subplot(211)
+   plot(t,taub,'-k')
+   hold on
+   plot(t,ones(size(taub))*tauc,'--k')
+   ylabel('W-C Combined Bottom Stress (Pa)')
+   subplot(212)
+   plot(t,ustc,'-r',t,ustw,'-b',t,ustcw,'-m')
+   ylabel('u* (m/s)')
+   shg
 end
 %% Exectute main program
 fm_bbl_main
